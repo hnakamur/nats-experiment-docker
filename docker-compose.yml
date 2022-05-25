@@ -1,0 +1,62 @@
+services:
+  node1:
+    image: local/nats
+    command: ["/usr/bin/bash", "-c", "sleep infinity"]
+    configs:
+      - source: node1_config
+        target: /usr/local/etc/nats-server.conf
+      - source: node1_crt
+        target: /usr/local/etc/node1.crt
+      - source: ca_crt
+        target: /usr/local/etc/my-root-ca.crt
+    secrets:
+      - source: node1_key
+        target: /usr/local/etc/node1.key
+  node2:
+    image: local/nats
+    command: ["/usr/bin/bash", "-c", "sleep infinity"]
+    configs:
+      - source: node2_config
+        target: /usr/local/etc/nats-server.conf
+      - source: node2_crt
+        target: /usr/local/etc/node2.crt
+      - source: ca_crt
+        target: /usr/local/etc/my-root-ca.crt
+    secrets:
+      - source: node2_key
+        target: /usr/local/etc/node2.key
+  node3:
+    image: local/nats
+    command: ["/usr/bin/bash", "-c", "sleep infinity"]
+    configs:
+      - source: node3_config
+        target: /usr/local/etc/nats-server.conf
+      - source: node3_crt
+        target: /usr/local/etc/node3.crt
+      - source: ca_crt
+        target: /usr/local/etc/my-root-ca.crt
+    secrets:
+      - source: node3_key
+        target: /usr/local/etc/node3.key
+configs:
+  node1_config:
+    file: node1.conf
+  node2_config:
+    file: node2.conf
+  node3_config:
+    file: node3.conf
+  ca_crt:
+    file: my-root-ca-data/my-root-ca.crt
+  node1_crt:
+    file: my-root-ca-data/certs/node1.crt
+  node2_crt:
+    file: my-root-ca-data/certs/node2.crt
+  node3_crt:
+    file: my-root-ca-data/certs/node3.crt
+secrets:
+  node1_key:
+    file: my-root-ca-data/private/node1.key
+  node2_key:
+    file: my-root-ca-data/private/node2.key
+  node3_key:
+    file: my-root-ca-data/private/node3.key
