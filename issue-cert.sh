@@ -72,7 +72,7 @@ cert_file="certs/$server_fqdn.crt"
 
 openssl genpkey -out "$key_file" -algorithm ED25519
 
-openssl req -new -config my-root-ca.conf -key "$key_file" -days "$days" -subj "/C=JP/O=$org_name/CN=$server_fqdn" -out "$csr_file"
+openssl req -new -config my-root-ca.conf -key "$key_file" -subj "/C=JP/O=$org_name/CN=$server_fqdn" -out "$csr_file"
 
 if [ -n "$server_ipaddr" ]; then
   subject_alt_name="DNS:$server_fqdn, IP:$server_ipaddr"
@@ -89,7 +89,7 @@ subjectKeyIdentifier = hash
 subjectAltName = $subject_alt_name
 EOF
 
-openssl ca -batch -config my-root-ca.conf -in "$csr_file" -notext -out "$cert_file" -extfile "$ext_file"
+openssl ca -batch -config my-root-ca.conf -in "$csr_file" -days "$days" -notext -out "$cert_file" -extfile "$ext_file"
 
 rm "$csr_file" "$ext_file"
 
