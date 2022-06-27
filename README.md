@@ -12,7 +12,7 @@ The following step uses 4 terminals:
 1. server at node1
 2. server at node2
 3. server at node3
-4. client at node4
+4. client at node1
 
 Run following command to build local docker image and start docker compose processes.
 
