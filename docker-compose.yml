@@ -1,7 +1,7 @@
 services:
   node1:
     image: local/nats
-    command: ["nats-server", "-config", "/usr/local/etc/nats-server.conf"]
+    command: ["/usr/bin/bash", "-c", "sleep infinity"]
     configs:
       - source: node1_config
         target: /usr/local/etc/nats-server.conf
@@ -12,9 +12,12 @@ services:
     secrets:
       - source: node1_key
         target: /usr/local/etc/node1.key
+    networks:
+      fixed_compose_network:
+        ipv4_address: 10.255.254.2
   node2:
     image: local/nats
-    command: ["nats-server", "-config", "/usr/local/etc/nats-server.conf"]
+    command: ["/usr/bin/bash", "-c", "sleep infinity"]
     configs:
       - source: node2_config
         target: /usr/local/etc/nats-server.conf
@@ -25,9 +28,12 @@ services:
     secrets:
       - source: node2_key
         target: /usr/local/etc/node2.key
+    networks:
+      fixed_compose_network:
+        ipv4_address: 10.255.254.3
   node3:
     image: local/nats
-    command: ["nats-server", "-config", "/usr/local/etc/nats-server.conf"]
+    command: ["/usr/bin/bash", "-c", "sleep infinity"]
     configs:
       - source: node3_config
         target: /usr/local/etc/nats-server.conf
@@ -38,6 +44,9 @@ services:
     secrets:
       - source: node3_key
         target: /usr/local/etc/node3.key
+    networks:
+      fixed_compose_network:
+        ipv4_address: 10.255.254.4
 configs:
   node1_config:
     file: node1.conf
@@ -60,3 +69,9 @@ secrets:
     file: my-root-ca-data/private/node2.key
   node3_key:
     file: my-root-ca-data/private/node3.key
+networks:
+  fixed_compose_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.255.254.0/24
