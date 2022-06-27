@@ -3,16 +3,14 @@ nats-experiment-docker
 
 A docker-compose config for experimenting with a [NATS](https://nats.io/) JetStream cluster.
 
-## How to try key value store
+## How to try JetStream in a cluster
 
-Arranged version of [Key/Value Store Walkthrough - NATS Docs](https://docs.nats.io/nats-concepts/jetstream/key-value-store/kv_walkthrough).
+Arranged version of [JetStream Walkthrough - NATS Docs](https://docs.nats.io/nats-concepts/jetstream/js_walkthrough).
 
-The following step uses 4 terminals:
+The following step uses 2 terminals:
 
-1. server at node1
-2. server at node2
-3. server at node3
-4. client at node1
+1. client1 at node1
+2. client2 at node2
 
 Run following command to build local docker image and start docker compose processes.
 
@@ -27,8 +25,18 @@ docker compose exec node1 bash
 ```
 
 ```
-nats-server -config /usr/local/etc/nats-server.conf
+nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt stream add my_stream \
+  --subjects=foo --storage=file --retention=limits --discard=old --max-msgs=-1 \
+  --max-msgs-per-subject=-1 \
+  --max-bytes=-1 --max-age=-1 --max-msg-size=-1 --dupe-window=2m \
+  --no-allow-rollup --no-deny-delete --no-deny-purge \
+  --replicas=3
 ```
+
+```
+nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt pub foo --count=1000 --sleep 1s "publication #{{Count}} @ {{TimeStamp}}"
+```
+
 
 Run the following commands at terminal #2:
 
@@ -37,91 +45,31 @@ docker compose exec node2 bash
 ```
 
 ```
-nats-server -config /usr/local/etc/nats-server.conf
-```
-
-Run the following commands at terminal #3:
-
-```
-docker compose exec node3 bash
+nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt consumer add my_stream pull_consumer --pull --deliver all --ack explicit --replay instant --filter='' --max-deliver=-1 --max-pending=0 --no-headers-only --backoff=linear
 ```
 
 ```
-nats-server -config /usr/local/etc/nats-server.conf
-```
-
-Run the following commands at terminal #4:
-
-```
-docker compose exec node1 bash
+nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt consumer next my_stream pull_consumer --count 1000 
 ```
 
 ```
-nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt kv add my_kv --replicas 3
+nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt consumer rm my_stream pull_consumer --force
 ```
 
 ```
-nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt kv put my_kv Key1 Value1
+nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt consumer ls my_stream
+```
+
+Run the following commands at terminal #1:
+
+```
+nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt stream purge my_stream --force
 ```
 
 ```
-nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt kv get my_kv Key1
+nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt stream rm my_stream --force
 ```
 
 ```
-nats --server https://node2:4222 --tlsca /usr/local/etc/my-root-ca.crt kv get my_kv Key1
-```
-
-```
-nats --server https://node3:4222 --tlsca /usr/local/etc/my-root-ca.crt kv get my_kv Key1
-```
-
-At terminal #1 press Ctrl-C to stop nats-server.
-
-At terminal #4 run following commands:
-
-```
-nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt kv get my_kv Key1
-```
-(an error is expected)
-
-```
-nats --server https://node2:4222 --tlsca /usr/local/etc/my-root-ca.crt kv get my_kv Key1
-```
-
-```
-nats --server https://node3:4222 --tlsca /usr/local/etc/my-root-ca.crt kv get my_kv Key1
-```
-
-```
-nats --server https://node2:4222 --tlsca /usr/local/etc/my-root-ca.crt kv put my_kv Key2 Value2
-```
-
-```
-nats --server https://node2:4222 --tlsca /usr/local/etc/my-root-ca.crt kv get my_kv Key2
-```
-
-```
-nats --server https://node3:4222 --tlsca /usr/local/etc/my-root-ca.crt kv get my_kv Key2
-```
-
-At terminal #1 start nats-server again:
-
-```
-nats-server -config /usr/local/etc/nats-server.conf
-```
-
-At terminal #4 run following commands:
-
-```
-nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt kv get my_kv Key2
-```
-(it is expected to get `Value2`)
-
-```
-exit
-```
-
-```
-docker compose rm --stop --force
+nats --server https://node1:4222 --tlsca /usr/local/etc/my-root-ca.crt stream ls
 ```

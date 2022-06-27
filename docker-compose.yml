@@ -1,7 +1,7 @@
 services:
   node1:
     image: local/nats
-    command: ["/usr/bin/bash", "-c", "sleep infinity"]
+    command: ["nats-server", "-config", "/usr/local/etc/nats-server.conf"]
     configs:
       - source: node1_config
         target: /usr/local/etc/nats-server.conf
@@ -14,7 +14,7 @@ services:
         target: /usr/local/etc/node1.key
   node2:
     image: local/nats
-    command: ["/usr/bin/bash", "-c", "sleep infinity"]
+    command: ["nats-server", "-config", "/usr/local/etc/nats-server.conf"]
     configs:
       - source: node2_config
         target: /usr/local/etc/nats-server.conf
@@ -27,7 +27,7 @@ services:
         target: /usr/local/etc/node2.key
   node3:
     image: local/nats
-    command: ["/usr/bin/bash", "-c", "sleep infinity"]
+    command: ["nats-server", "-config", "/usr/local/etc/nats-server.conf"]
     configs:
       - source: node3_config
         target: /usr/local/etc/nats-server.conf
