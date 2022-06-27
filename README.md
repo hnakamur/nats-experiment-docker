@@ -55,7 +55,7 @@ docker compose exec node1 bash
 ```
 
 ```
-export NATS_URL=https://node1:4222,https://node2:4222,https://node3:4222
+export NATS_URL=https://10.255.254.2:4222,https://10.255.254.3:4222,https://10.255.254.4:4222
 export NATS_CA=/usr/local/etc/my-root-ca.crt
 ```
 
@@ -80,7 +80,7 @@ docker compose exec node2 bash
 ```
 
 ```
-export NATS_URL=https://node1:4222,https://node2:4222,https://node3:4222
+export NATS_URL=https://10.255.254.2:4222,https://10.255.254.3:4222,https://10.255.254.4:4222
 export NATS_CA=/usr/local/etc/my-root-ca.crt
 ```
 
