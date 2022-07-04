@@ -7,6 +7,8 @@ A docker-compose config for experimenting with a [NATS](https://nats.io/) JetStr
 
 Arranged version of [JetStream Walkthrough - NATS Docs](https://docs.nats.io/nats-concepts/jetstream/js_walkthrough).
 
+Using [hnakamur/nats-stream-example](https://github.com/hnakamur/nats-stream-example) instead of [nats-io/natscli: The NATS Command Line Interface](https://github.com/nats-io/natscli).
+
 The following step uses 5 terminals:
 
 1. client1 at node1
@@ -55,21 +57,11 @@ docker compose exec node1 bash
 ```
 
 ```
-export NATS_URL=https://10.255.254.2:4222,https://10.255.254.3:4222,https://10.255.254.4:4222
-export NATS_CA=/usr/local/etc/my-root-ca.crt
+nats-stream-example stream-add --stream my_stream2 --subject foo2 --replicas 3
 ```
 
 ```
-nats stream add my_stream \
-  --subjects=foo --storage=file --retention=limits --discard=old --max-msgs=-1 \
-  --max-msgs-per-subject=-1 \
-  --max-bytes=-1 --max-age=-1 --max-msg-size=-1 --dupe-window=2m \
-  --no-allow-rollup --no-deny-delete --no-deny-purge \
-  --replicas=3
-```
-
-```
-nats pub foo --count=1000 --sleep 1s "publication #{{Count}} @ {{TimeStamp}}"
+nats-stream-example publish --subject foo2 --count 100
 ```
 
 
@@ -80,38 +72,11 @@ docker compose exec node2 bash
 ```
 
 ```
-export NATS_URL=https://10.255.254.2:4222,https://10.255.254.3:4222,https://10.255.254.4:4222
-export NATS_CA=/usr/local/etc/my-root-ca.crt
+nats-stream-example consumer-add --consumer pull_consumer2 --stream my_stream2
 ```
 
 ```
-nats consumer add my_stream pull_consumer --pull --deliver all --ack explicit --replay instant --filter='' --max-deliver=-1 --max-pending=0 --no-headers-only --backoff=linear
-```
-
-```
-nats consumer next my_stream pull_consumer --count 1000
-```
-
-```
-nats consumer rm my_stream pull_consumer --force
-```
-
-```
-nats consumer ls my_stream
-```
-
-Run the following commands at terminal #4:
-
-```
-nats stream purge my_stream --force
-```
-
-```
-nats stream rm my_stream --force
-```
-
-```
-nats stream ls
+nats-stream-example consumer-next --stream my_stream2 --consumer pull_consumer2 --count 100
 ```
 
 ## Stop the docker compose

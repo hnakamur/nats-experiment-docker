@@ -5,6 +5,9 @@ NODE_CERTS = my-root-ca-data/certs/node1.crt \
 up: build_image $(NODE_CERTS)
 	docker compose up -d
 
+certs: $(NODE_CERTS)
+
+
 my-root-ca-data/certs/node1.crt: my-root-ca-data/my-root-ca.crt
 	./issue-cert.sh --days 1 --ip 10.255.254.2 node1
 

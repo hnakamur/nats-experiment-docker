@@ -15,6 +15,9 @@ services:
     networks:
       fixed_compose_network:
         ipv4_address: 10.255.254.2
+    environment:
+      NATS_URL: https://10.255.254.2:4222,https://10.255.254.3:4222,https://10.255.254.4:4222
+      NATS_CA: /usr/local/etc/my-root-ca.crt
   node2:
     image: local/nats
     command: ["/usr/bin/bash", "-c", "sleep infinity"]
@@ -31,6 +34,9 @@ services:
     networks:
       fixed_compose_network:
         ipv4_address: 10.255.254.3
+    environment:
+      NATS_URL: https://10.255.254.2:4222,https://10.255.254.3:4222,https://10.255.254.4:4222
+      NATS_CA: /usr/local/etc/my-root-ca.crt
   node3:
     image: local/nats
     command: ["/usr/bin/bash", "-c", "sleep infinity"]
@@ -47,6 +53,9 @@ services:
     networks:
       fixed_compose_network:
         ipv4_address: 10.255.254.4
+    environment:
+      NATS_URL: https://10.255.254.2:4222,https://10.255.254.3:4222,https://10.255.254.4:4222
+      NATS_CA: /usr/local/etc/my-root-ca.crt
 configs:
   node1_config:
     file: node1.conf

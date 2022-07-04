@@ -17,3 +17,16 @@ RUN --mount=type=cache,target=/var/cache/apt --mount=type=cache,target=/var/lib/
 
   apt-get install -y "$server_deb" "$cli_deb"
 EOR
+
+RUN <<EOR
+  url_path=$(curl -s https://go.dev/dl/ | grep linux-amd64.tar.gz | head -1 | sed 's/.*href="//;s/">//')
+  curl -L https://go.dev${url_path} | tar -zxf - -C /usr/local/
+EOR
+
+ENV EXAMPLE_VER=2c834d7d967f024348fbaa478eae18e9749431ba
+
+RUN curl -L https://github.com/hnakamur/nats-stream-example/archive/${EXAMPLE_VER}.tar.gz | tar -zxf -
+WORKDIR /nats-stream-example-${EXAMPLE_VER}
+RUN /usr/local/go/bin/go build -o /usr/local/bin/nats-stream-example
+
+WORKDIR /root
